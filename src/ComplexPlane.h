@@ -17,8 +17,6 @@ public:
 
     void setCenter(const sf::Vector2f &coord);
 
-    sf::View &getView() { return m_view; };
-
     void setMouseLocation(const sf::Vector2f &coord);
 
     void loadText(sf::Text &text);
@@ -26,6 +24,8 @@ public:
     static size_t countIterations(sf::Vector2f coord);
 
     static void iterationsToRGB(size_t count, sf::Uint8 &r, sf::Uint8 &g, sf::Uint8 &b);
+
+    const sf::View &getView() const { return m_view; };
 
 private:
     sf::Vector2f m_mouseLocation;
