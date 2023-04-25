@@ -1,5 +1,7 @@
 #include <iostream>
+#include <thread>
 #include <mutex>
+#include <atomic>
 #include <SFML/Graphics.hpp>
 #include "ComplexPlane.h"
 
@@ -118,8 +120,8 @@ int main() {
 
                         // loop through x-values and compute color
                         for (int x = 0; x < vm.width; x++) {
-                            auto pixelCoord = window.mapPixelToCoords({x, y}, cxPlane.getView());
-                            auto nIters = ComplexPlane::countIterations(pixelCoord);
+                            Vector2f pixelCoord = window.mapPixelToCoords({x, y}, cxPlane.getView());
+                            size_t nIters = ComplexPlane::countIterations(pixelCoord);
 
                             Uint8 r, g, b;
                             ComplexPlane::iterationsToRGB(nIters, r, g, b);
