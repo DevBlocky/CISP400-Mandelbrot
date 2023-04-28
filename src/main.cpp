@@ -14,9 +14,10 @@ enum class DrawState {
 
 int main() {
     // the game window
-    auto vm = VideoMode(1920, 1080);
+    auto vm = VideoMode::getDesktopMode();
     auto aspectRatio = static_cast<float>(vm.height) / static_cast<float>(vm.width);
-    RenderWindow window(vm, "Mandelbrot", Style::Default);
+    RenderWindow window(vm, "Mandelbrot", Style::Fullscreen);
+    window.setFramerateLimit(60);
 
     // an abstract of the complex plane
     ComplexPlane cxPlane(aspectRatio);

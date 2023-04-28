@@ -2,6 +2,8 @@
 #include <complex>
 #include <sstream>
 
+#define CAST(val, prim) static_cast<prim>(val)
+
 ComplexPlane::ComplexPlane(float aspectRatio) : m_aspectRatio(aspectRatio) {
     m_view.setSize({BASE_WIDTH, BASE_HEIGHT * m_aspectRatio});
     m_view.setCenter({0.f, 0.f});
@@ -9,16 +11,16 @@ ComplexPlane::ComplexPlane(float aspectRatio) : m_aspectRatio(aspectRatio) {
 
 void ComplexPlane::zoomIn() {
     m_zoomCount++;
-    float xSize = BASE_WIDTH * pow(BASE_ZOOM, m_zoomCount);
-    float ySize = BASE_HEIGHT * m_aspectRatio * pow(BASE_ZOOM, m_zoomCount);
-    m_view.setSize({xSize, ySize});
+    double xSize = BASE_WIDTH * pow(BASE_ZOOM, m_zoomCount);
+    double ySize = BASE_HEIGHT * m_aspectRatio * pow(BASE_ZOOM, m_zoomCount);
+    m_view.setSize({CAST(xSize, float), CAST(ySize, float)});
 }
 
 void ComplexPlane::zoomOut() {
     m_zoomCount--;
-    float xSize = BASE_WIDTH * pow(BASE_ZOOM, m_zoomCount);
-    float ySize = BASE_HEIGHT * m_aspectRatio * pow(BASE_ZOOM, m_zoomCount);
-    m_view.setSize({xSize, ySize});
+    double xSize = BASE_WIDTH * pow(BASE_ZOOM, m_zoomCount);
+    double ySize = BASE_HEIGHT * m_aspectRatio * pow(BASE_ZOOM, m_zoomCount);
+    m_view.setSize({CAST(xSize, float), CAST(ySize, float)});
 }
 
 void ComplexPlane::setCenter(const sf::Vector2f &vec) {
@@ -63,24 +65,9 @@ void ComplexPlane::iterationsToRGB(size_t count, sf::Uint8 &r, sf::Uint8 &g, sf:
     b = 0;
     if (count >= MAX_ITER) return; // don't use more CPU time
 
-    // color based on count (lower index == lower count)
-    static std::vector<sf::Color> colorMaps = {
-            sf::Color::Red,
-            sf::Color::Yellow,
-            sf::Color::Green,
-            {48, 213, 200}, // turquoise
-            {255, 0, 255}, // purple
-    };
-
-    // find the color to use
-    for (size_t i = 0; i < colorMaps.size(); i++) {
-        auto threshold = static_cast<float>(i + 1) / static_cast<float>(colorMaps.size());
-        if (static_cast<float>(count) < threshold * MAX_ITER) {
-            auto const &color = colorMaps[i];
-            r = color.r;
-            g = color.g;
-            b = color.b;
-            return;
-        }
-    }
+    // yes I am aware that this will overflow r/g, and yes it's intended
+    float rgMultiplier = pow(CAST(count, float) / CAST(MAX_ITER, float), 1.f / 5.f);
+    r = CAST(255 * rgMultiplier, sf::Uint8);
+    g = CAST(255 * rgMultiplier, sf::Uint8);
+    b = 255;
 }
